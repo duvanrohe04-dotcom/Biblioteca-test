@@ -1,0 +1,23 @@
+from app import db
+from datetime import datetime, timezone
+
+class ComputerLoan(db.Model):
+    __tablename__ = 'computer_loans'
+
+    idLoan = db.Column(db.Integer, primary_key=True)
+    loanDate = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
+    returnDate = db.Column(db.DateTime, nullable=True)
+    status = db.Column(db.String(20), nullable=False, default='Active')
+
+    # Relaciones
+    computerId = db.Column(db.Integer, db.ForeignKey('computers.idComputer'), nullable=False)
+    userId = db.Column(db.Integer, db.ForeignKey('users.idUser'), nullable=False)
+
+    computer = db.relationship('Computer', back_populates='computerLoans', lazy=True)
+    user = db.relationship('User', back_populates='computerLoansUser', lazy=True)
+
+    def __init__(self, loanDate=None, returnDate=None, status=None, computerId=None, userId=None, **kwargs):
+        super().__init__(loanDate=loanDate, returnDate=returnDate, status=status, computerId=computerId, userId=userId, **kwargs)  # type: ignore
+
+    def __repr__(self):
+        return f'<ComputerLoan {self.idLoan} of Computer {self.computerId} to User {self.userId}>'
